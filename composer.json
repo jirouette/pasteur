@@ -1,0 +1,7 @@
+{
+    "name": "jr/pasteur",
+    "description": "Markov telegram bot",
+    "type": "project",
+    "license": "WTFPL",
+    "require": {}
+}
