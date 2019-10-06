@@ -3,5 +3,14 @@
     "description": "Markov telegram bot",
     "type": "project",
     "license": "WTFPL",
-    "require": {}
+    "require": {
+        "longman/telegram-bot": "*",
+        "react/event-loop": "*",
+        "react/mysql": "^0.5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pasteur\\": "pasteur/"
+        }
+    }
 }

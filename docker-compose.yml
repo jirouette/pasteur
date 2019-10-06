@@ -1,0 +1,27 @@
+version: '2'
+volumes:
+    pasteurdb:
+services:
+    pasteur:
+      container_name: "pasteur"
+      build: .
+      restart: always
+      links:
+        - mysql
+      env_file:
+        - .env
+      environment:
+        DATABASE: pasteur
+        DB_USER: pasteur
+        DB_HOST: mysql
+    mysql:
+      image: mysql:5.7
+      container_name: "pasteur_db"
+      restart: always
+      volumes:
+        - pasteurdb:/var/lib/mysql
+      env_file:
+        - .env
+      environment:
+        MYSQL_DATABASE: pasteur
+        MYSQL_USER: pasteur
