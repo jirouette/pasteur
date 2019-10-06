@@ -12,4 +12,6 @@ RUN composer install
 
 ADD pasteur pasteur
 
-CMD php pasteur/start.php
+ADD pasteur.bin .
+
+CMD ./pasteur.bin
