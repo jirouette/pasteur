@@ -7,13 +7,15 @@ use React\EventLoop\LoopInterface;
 use Pasteur\Commands\StartCommand;
 use Pasteur\Commands\SpeakCommand;
 use Pasteur\Commands\StartWithCommand;
+use Pasteur\Commands\SpeakForCommand;
 
 class Pasteur extends Telegram {
 
     const COMMANDS = [
         'Start' => StartCommand::class,
         'Speak' => SpeakCommand::class,
-        'Startwith' => StartWithCommand::class
+        'Startwith' => StartWithCommand::class,
+        'Speakfor' => SpeakForCommand::class
     ];
 
     /**
