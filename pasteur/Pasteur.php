@@ -42,7 +42,10 @@ class Pasteur extends Telegram {
 
         foreach($response->getResult() as $result) {
             /** @var $result \Longman\TelegramBot\Entities\Update */
-            // TODO parse data
+            $message = $result->getEditedMessage() ?? $result->getMessage();
+            if ($message !== null) {
+                Database::save($message);
+            }
         }
     }
 }
