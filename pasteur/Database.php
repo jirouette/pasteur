@@ -79,7 +79,8 @@ class Database {
             if ($sticker === null) {
                 return;
             }
-            // TODO parser sticker
+            $file_id = $sticker->getFileId();
+            $text = "sticker:${file_id}";
         }
 
         if ($text[0] == "/" || $text == "-") {
