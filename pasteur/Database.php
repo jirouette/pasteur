@@ -38,9 +38,9 @@ class Database {
         static::getConnection()->query('CREATE TABLE IF NOT EXISTS `words`
             (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
-                `message_id` int(11) NOT NULL,
-                `chat_id` int(11) NOT NULL,
-                `user_id` int(11) NOT NULL,
+                `message_id` bigint(20) NOT NULL,
+                `chat_id` bigint(20) NOT NULL,
+                `user_id` bigint(20) NOT NULL,
                 `datetime` datetime NOT NULL,
                 `author_username` varchar(50) NOT NULL,
                 `minus2_word` varchar(50) DEFAULT NULL,
