@@ -1,11 +1,11 @@
 <?php
 namespace Pasteur\Commands;
 
-use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Request;
 use Pasteur\Database;
+use Pasteur\Query;
 
-class SpeakCommand extends UserCommand {
+class SpeakCommand extends BaseCommand {
 	protected $name = 'speak';
 	protected $description = 'Markov-2 Sentence generator';
 	protected $usage = '/speak';
@@ -15,11 +15,10 @@ class SpeakCommand extends UserCommand {
 		$message = $this->getMessage();
 		$chat_id = $message->getChat()->getId();
 
-		Database::generate([], [], function($text) use($chat_id) {
-			return Request::sendMessage([
-				'chat_id' => $chat_id,
-				'text' => $text
-			]);
+		$conditions = new Query('chat_id = ?', [$chat_id]);
+
+		Database::generate([], [$conditions], function($text) use($chat_id) {
+			return static::sendSentence($text, $chat_id);
 		});
 		return null;
 	}

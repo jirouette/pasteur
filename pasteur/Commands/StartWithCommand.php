@@ -1,12 +1,10 @@
 <?php
 namespace Pasteur\Commands;
 
-use Longman\TelegramBot\Commands\UserCommand;
-use Longman\TelegramBot\Request;
 use Pasteur\Database;
 use Pasteur\Query;
 
-class StartWithCommand extends UserCommand {
+class StartWithCommand extends BaseCommand {
 	protected $name = 'startwith';
 	protected $description = 'Markov-2 Sentence generator with start conditions';
 	protected $usage = '/startwith';
@@ -24,11 +22,10 @@ class StartWithCommand extends UserCommand {
 			$ordered_conditions[] = new Query('word = ?', [$word]);
 		}
 
-		Database::generate($ordered_conditions, [], function($text) use($chat_id) {
-			return Request::sendMessage([
-				'chat_id' => $chat_id,
-				'text' => $text
-			]);
+		$conditions = new Query('chat_id = ?', [$chat_id]);
+
+		Database::generate($ordered_conditions, [$conditions], function($text) use($chat_id) {
+			return static::sendSentence($text, $chat_id);
 		});
 		return null;
 	}
