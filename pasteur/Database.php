@@ -59,7 +59,6 @@ class Database {
                 }
             },
             function (Exception $error) use($loop) {
-                var_dump($error);
                 $loop->addTimer(1, function() use($loop, $then) {
                     static::init($loop, $then);
                 });
@@ -118,6 +117,81 @@ class Database {
                 if ($then !== null) {
                     $then();
                 }
+            }
+        );
+    }
+
+    protected static function buildQuery(array $conditions): Query {
+        $whereInitialized = false;
+        $entries = [];
+        $sql = 'SELECT minus1_word, word, plus1_word FROM words ';
+        if (!empty($conditions)) {
+            $sql .= 'WHERE ';
+        }
+        foreach($conditions as $condition) {
+            if ($whereInitialized) {
+                $sql .= 'AND ';
+            }
+            $sql .= '('.$condition->query.') ';
+            $entries = array_merge($entries, $condition->entries);
+            $whereInitialized = true;
+        }
+        $sql .= 'ORDER BY RAND() LIMIT 0, 1';
+
+        return new Query($sql, $entries);
+    }
+
+    protected static function buildVolatileQuery(string $sentence): Query {
+        $words = empty($sentence) ? [] : explode(' ', $sentence);
+        $length = count($words);
+        if ($length == 0) {
+            return new Query('minus1_word IS NULL');
+        }
+        if ($length == 1) {
+            return new Query('minus2_word IS NULL AND minus1_word = ?', $words);
+        }
+
+        return new Query(
+            'minus2_word = ? AND minus1_word = ?',
+            [$words[$length-2], $words[$length-1]]
+        );
+    }
+
+    public static function generate(
+        array $ordered_conditions = [],
+        array $conditions = [],
+        callable $then = null,
+        string $sentence = ""
+    ): void {
+        $first_condition = null;
+        if (!empty($ordered_conditions)) {
+            $first_condition = array_shift($ordered_conditions);
+        }
+
+        $query_conditions = [];
+        if ($first_condition !== null) {
+            $query_conditions[] = $first_condition;
+        }
+        foreach($conditions as $condition) {
+            $query_conditions[] = $condition;
+        }
+        $query_conditions[] = static::buildVolatileQuery(trim($sentence));
+        $query = static::buildQuery($query_conditions);
+
+        static::getConnection()->query($query->query, $query->entries)->then(
+            function(QueryResult $command) use($ordered_conditions, $conditions, $then, $sentence) {
+                $sentence .= ' ' . $command->resultRows[0]["word"] ?? '';
+
+                if ($command->resultRows[0]["plus1_word"] === null) {
+                    return $then(trim($sentence));
+                }
+
+                static::generate(
+                    $ordered_conditions,
+                    $conditions,
+                    $then,
+                    $sentence
+                );
             }
         );
     }

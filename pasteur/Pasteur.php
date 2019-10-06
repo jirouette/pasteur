@@ -2,9 +2,19 @@
 namespace Pasteur;
 
 use Longman\TelegramBot\Telegram;
+use Longman\TelegramBot\Request;
 use React\EventLoop\LoopInterface;
+use Pasteur\Commands\StartCommand;
+use Pasteur\Commands\SpeakCommand;
+use Pasteur\Commands\StartWithCommand;
 
 class Pasteur extends Telegram {
+
+    const COMMANDS = [
+        'Start' => StartCommand::class,
+        'Speak' => SpeakCommand::class,
+        'Startwith' => StartWithCommand::class
+    ];
 
     /**
      * @var LoopInterface
@@ -24,6 +34,16 @@ class Pasteur extends Telegram {
         Database::init($loop, function() use ($pasteur) {
             $pasteur->initTelegram();
         });
+    }
+
+    public function getCommandObject($command)
+    {
+        $command_class = static::COMMANDS[$this->ucfirstUnicode($command)] ?? null;
+        if ($command_class !== null) {
+            return new $command_class($this, $this->update);
+        }
+
+        return parent::getCommandObject($command);
     }
 
     public function initTelegram(): void {
